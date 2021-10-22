@@ -1,0 +1,54 @@
+Mineração de Texto
+```{r}
+library(tm)
+library(textreadr)
+library(wordcloud)
+library(RColorBrewer)
+```
+Criamos corpus
+```{r}
+getSources()
+
+getReaders()
+
+x = read_html("https://en.wikipedia.org/wiki/Artificial_intelligence")
+corpus = VCorpus(VectorSource(x), readerControl = list(reader = readPlain, language = "eng"))
+```
+Explorado Corpus
+```{r}
+inspect(corpus)
+inspect(corpus[1:100])
+meta(corpus[[1]])
+inspect(corpus[[2]])
+as.character(corpus[[2]])
+as.character(corpus[[200]])[1]
+```
+ Tratamentos diversos
+```{r}
+stopwords("portuguese")
+corpus = tm_map(corpus, removeWords, stopwords("english"))
+corpus = tm_map(corpus, stripWhitespace)
+corpus = tm_map(corpus, removePunctuation)
+corpus = tm_map(corpus, removeNumbers)
+```
+Primeiro Wordcloud
+```{r}
+wordcloud(corpus,max.words=50, random.order=T, colors=rainbow(8), rot.per=0.5, use.r.layout = T)
+```
+Matriz de termos frequêntes
+```{r}
+freq = TermDocumentMatrix(corpus)
+freq
+matriz = as.matrix(freq)
+matriz = sort(rowSums(matriz), decreasing=TRUE)
+matriz = data.frame(word=names(matriz), freq=matriz)
+head(matriz, n=100)
+findFreqTerms(freq,500,Inf)
+removeSparseTerms(freq,0.4)
+```
+Nova Nuvem
+```{r}
+wordcloud(matriz$word, matriz$freq, max.words = 50, random.order=T, colors=rainbow(8), rot.per=0.5, use.r.layout = T)
+```
+
+ 
